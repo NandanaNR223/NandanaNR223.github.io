@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Nandana Rajesh Nair — Computational Linguist</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Mono:wght@300;400;500&family=Fraunces:ital,opsz,wght@0,9..144,200;0,9..144,400;1,9..144,200;1,9..144,300&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --cream: #F5F0E8;
+      --warm-white: #FAF7F2;
+      --ink: #1C1A17;
+      --terracotta: #C4673A;
+      --sage: #7A8C6E;
+      --dusty-rose: #C4957A;
+      --gold: #B8924A;
+      --light-ink: #4A4540;
+      --border: rgba(28,26,23,0.12);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background-color: var(--cream);
+      color: var(--ink);
+      font-family: 'DM Mono', monospace;
+      font-weight: 300;
+      overflow-x: hidden;
+    }
+
+    /* NOISE TEXTURE OVERLAY */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 1000;
+      opacity: 0.4;
+    }
+
+    /* NAV */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.4rem 3rem;
+      background: rgba(245,240,232,0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-logo {
+      font-family: 'Fraunces', serif;
+      font-size: 1rem;
+      font-weight: 200;
+      letter-spacing: 0.02em;
+      color: var(--ink);
+      text-decoration: none;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 2.5rem;
+      list-style: none;
+    }
+
+    .nav-links a {
+      font-size: 0.7rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--light-ink);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover { color: var(--terracotta); }
+
+    /* HERO */
+    .hero {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      padding-top: 5rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-left {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 6rem 4rem 6rem 5rem;
+      position: relative;
+      z-index: 2;
+    }
+
+    .hero-eyebrow {
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--terracotta);
+      margin-bottom: 1.8rem;
+      opacity: 0;
+      animation: fadeUp 0.8s ease 0.2s forwards;
+    }
+
+    .hero-name {
+      font-family: 'Fraunces', serif;
+      font-size: clamp(3rem, 5vw, 5.5rem);
+      font-weight: 200;
+      line-height: 1.05;
+      letter-spacing: -0.01em;
+      margin-bottom: 1.5rem;
+      opacity: 0;
+      animation: fadeUp 0.8s ease 0.4s forwards;
+    }
+
+    .hero-name em {
+      font-style: italic;
+      color: var(--terracotta);
+    }
+
+    .hero-tagline {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(1.1rem, 1.8vw, 1.4rem);
+      font-weight: 300;
+      font-style: italic;
+      color: var(--light-ink);
+      line-height: 1.6;
+      max-width: 420px;
+      margin-bottom: 3rem;
+      opacity: 0;
+      animation: fadeUp 0.8s ease 0.6s forwards;
+    }
+
+    .hero-cta {
+      display: flex;
+      gap: 1.2rem;
+      flex-wrap: wrap;
+      opacity: 0;
+      animation: fadeUp 0.8s ease 0.8s forwards;
+    }
+
+    .btn-primary {
+      display: inline-block;
+      padding: 0.85rem 2rem;
+      background: var(--ink);
+      color: var(--cream);
+      font-family: 'DM Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      text-decoration: none;
+      border: 1px solid var(--ink);
+      transition: all 0.25s ease;
+    }
+
+    .btn-primary:hover {
+      background: var(--terracotta);
+      border-color: var(--terracotta);
+    }
+
+    .btn-secondary {
+      display: inline-block;
+      padding: 0.85rem 2rem;
+      background: transparent;
+      color: var(--ink);
+      font-family: 'DM Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      text-decoration: none;
+      border: 1px solid var(--border);
+      transition: all 0.25s ease;
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--terracotta);
+      color: var(--terracotta);
+    }
+
+    .hero-right {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .hero-visual {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .hero-circle {
+      width: 480px;
+      height: 480px;
+      border-radius: 50%;
+      background: radial-gradient(ellipse at 40% 40%, rgba(196,103,58,0.15), rgba(122,140,110,0.08) 60%, transparent);
+      border: 1px solid rgba(196,103,58,0.2);
+      animation: pulse 6s ease-in-out infinite;
+      position: absolute;
+    }
+
+    .hero-circle-2 {
+      width: 320px;
+      height: 320px;
+      border-radius: 50%;
+      border: 1px solid rgba(196,103,58,0.1);
+      animation: pulse 6s ease-in-out 1s infinite;
+      position: absolute;
+    }
+
+    .floating-words {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      animation: fadeIn 1.5s ease 1.2s forwards;
+    }
+
+    .word-float {
+      position: absolute;
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      color: var(--light-ink);
+      opacity: 0.3;
+      font-size: 0.9rem;
+      letter-spacing: 0.05em;
+    }
+
+    .word-float:nth-child(1) { top: 20%; left: 15%; font-size: 0.75rem; animation: floatWord 8s ease-in-out infinite; }
+    .word-float:nth-child(2) { top: 35%; right: 20%; font-size: 1rem; animation: floatWord 10s ease-in-out 1s infinite; }
+    .word-float:nth-child(3) { top: 55%; left: 25%; font-size: 0.8rem; animation: floatWord 9s ease-in-out 2s infinite; }
+    .word-float:nth-child(4) { top: 70%; right: 15%; font-size: 0.7rem; animation: floatWord 11s ease-in-out 0.5s infinite; }
+    .word-float:nth-child(5) { top: 15%; right: 30%; font-size: 0.85rem; animation: floatWord 7s ease-in-out 1.5s infinite; }
+    .word-float:nth-child(6) { top: 80%; left: 35%; font-size: 0.75rem; animation: floatWord 12s ease-in-out 3s infinite; }
+
+    .hero-divider {
+      position: absolute;
+      left: 0;
+      top: 15%;
+      bottom: 15%;
+      width: 1px;
+      background: linear-gradient(to bottom, transparent, var(--border) 30%, var(--border) 70%, transparent);
+    }
+
+    /* ABOUT STRIP */
+    .about-strip {
+      background: var(--ink);
+      color: var(--cream);
+      padding: 5rem;
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: 4rem;
+      align-items: start;
+    }
+
+    .about-label {
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--terracotta);
+      padding-top: 0.3rem;
+    }
+
+    .about-text {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(1.3rem, 2.2vw, 1.8rem);
+      font-weight: 300;
+      line-height: 1.65;
+      color: rgba(245,240,232,0.9);
+    }
+
+    .about-text strong {
+      font-weight: 600;
+      color: var(--dusty-rose);
+    }
+
+    /* SKILLS */
+    .skills-section {
+      padding: 6rem 5rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .section-header {
+      display: flex;
+      align-items: baseline;
+      gap: 1.5rem;
+      margin-bottom: 3.5rem;
+    }
+
+    .section-number {
+      font-size: 0.65rem;
+      letter-spacing: 0.15em;
+      color: var(--terracotta);
+    }
+
+    .section-title {
+      font-family: 'Fraunces', serif;
+      font-size: clamp(1.8rem, 3vw, 2.8rem);
+      font-weight: 200;
+      letter-spacing: -0.01em;
+    }
+
+    .skills-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0;
+      border: 1px solid var(--border);
+    }
+
+    .skill-card {
+      padding: 2.5rem;
+      border-right: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      transition: background 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .skill-card:hover { background: rgba(196,103,58,0.04); }
+
+    .skill-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 3px;
+      height: 0;
+      background: var(--terracotta);
+      transition: height 0.3s ease;
+    }
+
+    .skill-card:hover::before { height: 100%; }
+
+    .skill-icon {
+      font-size: 1.4rem;
+      margin-bottom: 1rem;
+    }
+
+    .skill-name {
+      font-family: 'Fraunces', serif;
+      font-size: 1.1rem;
+      font-weight: 300;
+      margin-bottom: 0.8rem;
+    }
+
+    .skill-desc {
+      font-size: 0.72rem;
+      line-height: 1.7;
+      color: var(--light-ink);
+    }
+
+    .skill-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin-top: 1.2rem;
+    }
+
+    .tag {
+      font-size: 0.6rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 0.25rem 0.6rem;
+      border: 1px solid var(--border);
+      color: var(--light-ink);
+    }
+
+    /* PROJECTS */
+    .projects-section {
+      padding: 6rem 5rem;
+    }
+
+    .projects-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2px;
+      background: var(--border);
+      border: 1px solid var(--border);
+    }
+
+    .project-card {
+      background: var(--warm-white);
+      padding: 3rem;
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    .project-card:hover { background: var(--cream); }
+
+    .project-card.featured {
+      grid-column: span 2;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3rem;
+      background: var(--ink);
+      color: var(--cream);
+    }
+
+    .project-number {
+      font-size: 0.6rem;
+      letter-spacing: 0.15em;
+      color: var(--terracotta);
+      margin-bottom: 1.5rem;
+    }
+
+    .project-card.featured .project-number { color: var(--dusty-rose); }
+
+    .project-title {
+      font-family: 'Fraunces', serif;
+      font-size: clamp(1.3rem, 2vw, 1.8rem);
+      font-weight: 200;
+      line-height: 1.2;
+      margin-bottom: 1rem;
+      letter-spacing: -0.01em;
+    }
+
+    .project-card.featured .project-title { color: var(--cream); font-size: clamp(1.6rem, 2.5vw, 2.2rem); }
+
+    .project-desc {
+      font-size: 0.75rem;
+      line-height: 1.8;
+      color: var(--light-ink);
+      margin-bottom: 1.5rem;
+    }
+
+    .project-card.featured .project-desc { color: rgba(245,240,232,0.7); }
+
+    .project-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .meta-tag {
+      font-size: 0.6rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 0.3rem 0.7rem;
+      border: 1px solid rgba(28,26,23,0.15);
+      color: var(--light-ink);
+    }
+
+    .project-card.featured .meta-tag {
+      border-color: rgba(245,240,232,0.2);
+      color: rgba(245,240,232,0.7);
+    }
+
+    .project-link {
+      font-size: 0.65rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--terracotta);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: gap 0.2s;
+    }
+
+    .project-link:hover { gap: 0.9rem; }
+    .project-card.featured .project-link { color: var(--dusty-rose); }
+
+    .project-visual {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .coherence-diagram {
+      width: 100%;
+      max-width: 340px;
+    }
+
+    /* EXPERIENCE */
+    .experience-section {
+      padding: 6rem 5rem;
+      background: var(--warm-white);
+      border-top: 1px solid var(--border);
+    }
+
+    .timeline {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      border-left: 1px solid var(--border);
+      margin-left: 1rem;
+    }
+
+    .timeline-item {
+      padding: 2.5rem 3rem;
+      position: relative;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .timeline-item::before {
+      content: '';
+      position: absolute;
+      left: -5px;
+      top: 3rem;
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: var(--cream);
+      border: 1px solid var(--terracotta);
+    }
+
+    .timeline-date {
+      font-size: 0.65rem;
+      letter-spacing: 0.1em;
+      color: var(--terracotta);
+      margin-bottom: 0.6rem;
+    }
+
+    .timeline-title {
+      font-family: 'Fraunces', serif;
+      font-size: 1.2rem;
+      font-weight: 300;
+      margin-bottom: 0.3rem;
+    }
+
+    .timeline-place {
+      font-size: 0.7rem;
+      color: var(--light-ink);
+      margin-bottom: 1rem;
+    }
+
+    .timeline-desc {
+      font-size: 0.73rem;
+      line-height: 1.8;
+      color: var(--light-ink);
+      max-width: 600px;
+    }
+
+    /* CONTACT */
+    .contact-section {
+      padding: 7rem 5rem;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6rem;
+      align-items: center;
+      border-top: 1px solid var(--border);
+    }
+
+    .contact-heading {
+      font-family: 'Fraunces', serif;
+      font-size: clamp(2.5rem, 5vw, 4.5rem);
+      font-weight: 200;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+    }
+
+    .contact-heading em {
+      font-style: italic;
+      color: var(--terracotta);
+    }
+
+    .contact-links {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .contact-item {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      padding: 1.5rem;
+      border: 1px solid var(--border);
+      text-decoration: none;
+      color: var(--ink);
+      transition: all 0.25s ease;
+    }
+
+    .contact-item:hover {
+      border-color: var(--terracotta);
+      background: rgba(196,103,58,0.04);
+    }
+
+    .contact-item-icon { font-size: 1.2rem; }
+
+    .contact-item-text { flex: 1; }
+    .contact-item-label {
+      font-size: 0.6rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--terracotta);
+      margin-bottom: 0.2rem;
+    }
+    .contact-item-value {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1rem;
+      font-weight: 300;
+    }
+
+    .contact-arrow {
+      font-size: 0.9rem;
+      color: var(--light-ink);
+      transition: transform 0.2s;
+    }
+
+    .contact-item:hover .contact-arrow { transform: translateX(4px); }
+
+    /* FOOTER */
+    footer {
+      padding: 2rem 5rem;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    footer p {
+      font-size: 0.65rem;
+      letter-spacing: 0.08em;
+      color: var(--light-ink);
+    }
+
+    /* ANIMATIONS */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 0.6; }
+      50% { transform: scale(1.04); opacity: 1; }
+    }
+
+    @keyframes floatWord {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-12px); }
+    }
+
+    /* SCROLL REVEAL */
+    .reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 900px) {
+      .hero { grid-template-columns: 1fr; }
+      .hero-right { display: none; }
+      .hero-left { padding: 6rem 2rem 4rem; }
+      nav { padding: 1.2rem 2rem; }
+      .nav-links { gap: 1.5rem; }
+      .about-strip { grid-template-columns: 1fr; padding: 3rem 2rem; gap: 1.5rem; }
+      .skills-section, .projects-section, .experience-section, .contact-section { padding: 4rem 2rem; }
+      .skills-grid { grid-template-columns: 1fr; }
+      .projects-grid { grid-template-columns: 1fr; }
+      .project-card.featured { grid-column: span 1; grid-template-columns: 1fr; }
+      .contact-section { grid-template-columns: 1fr; gap: 3rem; }
+      footer { padding: 2rem; flex-direction: column; gap: 0.5rem; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <a href="#" class="nav-logo">Nandana Rajesh Nair</a>
+    <ul class="nav-links">
+      <li><a href="#about">About</a></li>
+      <li><a href="#projects">Projects</a></li>
+      <li><a href="#experience">Experience</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-left">
+      <p class="hero-eyebrow">Computational Linguist · NLP · Semantics & Discourse</p>
+      <h1 class="hero-name">Nandana<br/><em>Rajesh Nair</em></h1>
+      <p class="hero-tagline">An artist first, who takes that curiosity forward into language and technology.</p>
+      <div class="hero-cta">
+        <a href="#projects" class="btn-primary">View Projects</a>
+        <a href="#contact" class="btn-secondary">Get in Touch</a>
+      </div>
+    </div>
+    <div class="hero-right">
+      <div class="hero-visual">
+        <div class="hero-circle"></div>
+        <div class="hero-circle-2"></div>
+        <div class="floating-words">
+          <span class="word-float">coherence</span>
+          <span class="word-float">discourse</span>
+          <span class="word-float">aphasia</span>
+          <span class="word-float">semantics</span>
+          <span class="word-float">pragmatics</span>
+          <span class="word-float">narrative</span>
+        </div>
+      </div>
+      <div class="hero-divider"></div>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section class="about-strip" id="about">
+    <div class="about-label">About</div>
+    <p class="about-text">
+      I am a Computational Linguist with a graduate background from the <strong>University at Buffalo</strong>, specializing in <strong>semantics, discourse, and narrative coherence</strong>. My work sits at the intersection of how human language breaks down — and how artificial language systems mirror those same fractures. I bring an artist's eye for pattern and an analyst's precision for structure to every problem I work on.
+    </p>
+  </section>
+
+  <!-- SKILLS -->
+  <section class="skills-section reveal" id="skills">
+    <div class="section-header">
+      <span class="section-number">01</span>
+      <h2 class="section-title">Expertise</h2>
+    </div>
+    <div class="skills-grid">
+      <div class="skill-card">
+        <div class="skill-icon">🧠</div>
+        <div class="skill-name">Semantics & Discourse</div>
+        <div class="skill-desc">Deep theoretical grounding in meaning, reference, coherence relations, and discourse structure. Trained to identify what holds language together — and what pulls it apart.</div>
+        <div class="skill-tags">
+          <span class="tag">RST</span><span class="tag">Coreference</span><span class="tag">Coherence</span><span class="tag">Speech Acts</span>
+        </div>
+      </div>
+      <div class="skill-card">
+        <div class="skill-icon">🔬</div>
+        <div class="skill-name">Clinical Linguistics</div>
+        <div class="skill-desc">Specialized study of aphasic speech and narrative breakdown. Expertise in how language impairment affects storytelling, topic continuity, and referential chains — rare knowledge in the NLP industry.</div>
+        <div class="skill-tags">
+          <span class="tag">Aphasia</span><span class="tag">Narrative Analysis</span><span class="tag">Language Disorders</span>
+        </div>
+      </div>
+      <div class="skill-card">
+        <div class="skill-icon">🤖</div>
+        <div class="skill-name">LLM Evaluation</div>
+        <div class="skill-desc">Applying linguistic frameworks to assess and document failure modes in large language models — particularly around coherence, implicature, and discourse-level understanding.</div>
+        <div class="skill-tags">
+          <span class="tag">Prompt Analysis</span><span class="tag">Error Taxonomy</span><span class="tag">Benchmarking</span>
+        </div>
+      </div>
+      <div class="skill-card">
+        <div class="skill-icon">🐍</div>
+        <div class="skill-name">Python & NLP Tools</div>
+        <div class="skill-desc">Working knowledge of Python for text processing and linguistic analysis, with experience using NLP libraries in research contexts.</div>
+        <div class="skill-tags">
+          <span class="tag">Python</span><span class="tag">NLTK</span><span class="tag">spaCy</span><span class="tag">Jupyter</span>
+        </div>
+      </div>
+      <div class="skill-card">
+        <div class="skill-icon">🏷️</div>
+        <div class="skill-name">Data Annotation</div>
+        <div class="skill-desc">Rigorous linguistic annotation with structured methodology. Able to design annotation schemas, apply them consistently, and document inter-annotator agreement.</div>
+        <div class="skill-tags">
+          <span class="tag">Annotation Schema</span><span class="tag">Corpus Building</span><span class="tag">IAA</span>
+        </div>
+      </div>
+      <div class="skill-card">
+        <div class="skill-icon">✍️</div>
+        <div class="skill-name">Research & Writing</div>
+        <div class="skill-desc">Graduate-level academic writing and analytical thinking. Able to translate complex linguistic insights into clear, compelling documentation and research reports.</div>
+        <div class="skill-tags">
+          <span class="tag">Academic Writing</span><span class="tag">Analysis</span><span class="tag">Documentation</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROJECTS -->
+  <section class="projects-section reveal" id="projects">
+    <div class="section-header">
+      <span class="section-number">02</span>
+      <h2 class="section-title">Projects</h2>
+    </div>
+    <div class="projects-grid">
+
+      <!-- FEATURED PROJECT -->
+      <div class="project-card featured">
+        <div>
+          <p class="project-number">Project 001 — Featured</p>
+          <h3 class="project-title">When AI Loses the Thread: Discourse Coherence Failure in LLMs</h3>
+          <p class="project-desc">
+            Drawing on frameworks developed in clinical linguistics to study aphasic narrative breakdown, this project applies the same analytical lens to large language models. Using coherence relation analysis and referential chain tracking, I identify and taxonomize the specific ways LLMs lose narrative thread in extended generation tasks — and map these failure modes onto established aphasia subtypes.
+          </p>
+          <div class="project-meta">
+            <span class="meta-tag">Python</span>
+            <span class="meta-tag">Discourse Analysis</span>
+            <span class="meta-tag">LLM Evaluation</span>
+            <span class="meta-tag">RST</span>
+            <span class="meta-tag">Coherence</span>
+          </div>
+          <a href="#" class="project-link">View Case Study →</a>
+        </div>
+        <div class="project-visual">
+          <svg class="coherence-diagram" viewBox="0 0 320 280" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- Nodes -->
+            <circle cx="160" cy="40" r="24" stroke="rgba(245,240,232,0.4)" stroke-width="1" fill="rgba(196,103,58,0.15)"/>
+            <text x="160" y="45" text-anchor="middle" fill="rgba(245,240,232,0.8)" font-size="9" font-family="DM Mono">S1</text>
+
+            <circle cx="80" cy="120" r="24" stroke="rgba(245,240,232,0.4)" stroke-width="1" fill="rgba(196,103,58,0.1)"/>
+            <text x="80" y="125" text-anchor="middle" fill="rgba(245,240,232,0.8)" font-size="9" font-family="DM Mono">S2</text>
+
+            <circle cx="240" cy="120" r="24" stroke="rgba(245,240,232,0.4)" stroke-width="1" fill="rgba(196,103,58,0.1)"/>
+            <text x="240" y="125" text-anchor="middle" fill="rgba(245,240,232,0.8)" font-size="9" font-family="DM Mono">S3</text>
+
+            <circle cx="50" cy="210" r="20" stroke="rgba(245,240,232,0.2)" stroke-width="1" fill="rgba(122,140,110,0.12)"/>
+            <text x="50" y="215" text-anchor="middle" fill="rgba(245,240,232,0.6)" font-size="8" font-family="DM Mono">S4</text>
+
+            <circle cx="160" cy="210" r="20" stroke="rgba(245,240,232,0.2)" stroke-width="1" fill="rgba(122,140,110,0.12)"/>
+            <text x="160" y="215" text-anchor="middle" fill="rgba(245,240,232,0.6)" font-size="8" font-family="DM Mono">S5</text>
+
+            <circle cx="270" cy="210" r="20" stroke="rgba(196,103,58,0.5)" stroke-width="1.5" stroke-dasharray="4 2" fill="rgba(196,103,58,0.05)"/>
+            <text x="270" y="215" text-anchor="middle" fill="rgba(196,103,58,0.7)" font-size="8" font-family="DM Mono">?</text>
+
+            <!-- Lines -->
+            <line x1="160" y1="64" x2="100" y2="96" stroke="rgba(245,240,232,0.25)" stroke-width="1"/>
+            <line x1="160" y1="64" x2="220" y2="96" stroke="rgba(245,240,232,0.25)" stroke-width="1"/>
+            <line x1="80" y1="144" x2="60" y2="190" stroke="rgba(245,240,232,0.15)" stroke-width="1"/>
+            <line x1="80" y1="144" x2="148" y2="193" stroke="rgba(245,240,232,0.15)" stroke-width="1"/>
+            <line x1="240" y1="144" x2="258" y2="190" stroke="rgba(196,103,58,0.3)" stroke-width="1" stroke-dasharray="3 2"/>
+
+            <!-- Labels -->
+            <text x="118" y="88" fill="rgba(245,240,232,0.35)" font-size="7" font-family="DM Mono">elaboration</text>
+            <text x="195" y="88" fill="rgba(245,240,232,0.35)" font-size="7" font-family="DM Mono">contrast</text>
+            <text x="272" y="170" fill="rgba(196,103,58,0.5)" font-size="7" font-family="DM Mono">break</text>
+
+            <!-- Legend -->
+            <rect x="20" y="250" width="8" height="1" fill="rgba(245,240,232,0.4)"/>
+            <text x="34" y="255" fill="rgba(245,240,232,0.35)" font-size="7" font-family="DM Mono">coherent link</text>
+            <line x1="150" y1="254" x2="162" y2="254" stroke="rgba(196,103,58,0.5)" stroke-width="1" stroke-dasharray="3 2"/>
+            <text x="168" y="257" fill="rgba(245,240,232,0.35)" font-size="7" font-family="DM Mono">coherence break</text>
+          </svg>
+        </div>
+      </div>
+
+      <!-- PROJECT 2 -->
+      <div class="project-card">
+        <p class="project-number">Project 002</p>
+        <h3 class="project-title">Referential Chains in Aphasic Narrative: A Corpus Study</h3>
+        <p class="project-desc">
+          A structured annotation and analysis of referential chain integrity across aphasic and non-aphasic speech samples. Documents how different aphasia subtypes affect the ability to maintain coherent reference — with implications for evaluating similar breakdowns in generative AI systems.
+        </p>
+        <div class="project-meta">
+          <span class="meta-tag">Corpus Linguistics</span>
+          <span class="meta-tag">Annotation</span>
+          <span class="meta-tag">Aphasia</span>
+          <span class="meta-tag">Reference</span>
+        </div>
+        <a href="#" class="project-link">View Case Study →</a>
+      </div>
+
+      <!-- PROJECT 3 -->
+      <div class="project-card">
+        <p class="project-number">Project 003</p>
+        <h3 class="project-title">Scalar Implicature Stress-Testing in GPT-4</h3>
+        <p class="project-desc">
+          A systematic evaluation of how GPT-4 handles scalar implicature — the pragmatic inferences triggered by words like "some," "possible," and "warm." Documents consistent failure patterns, categorizes them by implicature type, and proposes a diagnostic framework for future LLM benchmarking.
+        </p>
+        <div class="project-meta">
+          <span class="meta-tag">Pragmatics</span>
+          <span class="meta-tag">LLM Evaluation</span>
+          <span class="meta-tag">Implicature</span>
+          <span class="meta-tag">GPT-4</span>
+        </div>
+        <a href="#" class="project-link">View Case Study →</a>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- EXPERIENCE -->
+  <section class="experience-section reveal" id="experience">
+    <div class="section-header">
+      <span class="section-number">03</span>
+      <h2 class="section-title">Education & Experience</h2>
+    </div>
+    <div class="timeline">
+      <div class="timeline-item">
+        <div class="timeline-date">2023 – 2024</div>
+        <div class="timeline-title">M.A. Computational Linguistics</div>
+        <div class="timeline-place">University at Buffalo, State University of New York</div>
+        <div class="timeline-desc">Graduate-level study in computational linguistics with a focus on semantics, discourse analysis, and the cognitive architecture of language. Coursework included NLP methods, corpus linguistics, and the study of language pathology including aphasic speech and narrative coherence.</div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">Ongoing</div>
+        <div class="timeline-title">Independent Researcher</div>
+        <div class="timeline-place">Computational Semantics & LLM Evaluation</div>
+        <div class="timeline-desc">Applying clinical linguistics frameworks — developed for the analysis of aphasic discourse — to the evaluation of large language model outputs. Focused on coherence, referential integrity, and narrative structure as diagnostic lenses for AI language systems.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section class="contact-section reveal" id="contact">
+    <div>
+      <h2 class="contact-heading">Let's build<br/>something<br/><em>meaningful.</em></h2>
+    </div>
+    <div class="contact-links">
+      <a href="mailto:nrajesh.nandanam@gmail.com" class="contact-item">
+        <span class="contact-item-icon">✉️</span>
+        <div class="contact-item-text">
+          <div class="contact-item-label">Email</div>
+          <div class="contact-item-value">nrajesh.nandanam@gmail.com</div>
+        </div>
+        <span class="contact-arrow">→</span>
+      </a>
+      <a href="https://www.linkedin.com/in/nandana-rajesh-nair-44b077241/" class="contact-item">
+        <span class="contact-item-icon">💼</span>
+        <div class="contact-item-text">
+          <div class="contact-item-label">LinkedIn</div>
+          <div class="contact-item-value">linkedin.com/in/nandana-rajesh-nair</div>
+        </div>
+        <span class="contact-arrow">→</span>
+      </a>
+      <a href="https://github.com/NandanaNR223" class="contact-item">
+        <span class="contact-item-icon">⌨️</span>
+        <div class="contact-item-text">
+          <div class="contact-item-label">GitHub</div>
+          <div class="contact-item-value">github.com/NandanaNR223</div>
+        </div>
+        <span class="contact-arrow">→</span>
+      </a>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <p>© 2026 Nandana Rajesh Nair</p>
+    <p>Computational Linguist · Semantics & Discourse · NLP</p>
+  </footer>
+
+  <script>
+    // Scroll reveal
+    const reveals = document.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.1 });
+    reveals.forEach(el => observer.observe(el));
+  </script>
+
+</body>
+</html>
