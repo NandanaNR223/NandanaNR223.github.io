@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Project 001 — When AI Loses the Thread · Nandana Rajesh Nair</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=DM+Mono:wght@300;400;500&family=Fraunces:ital,opsz,wght@0,9..144,200;0,9..144,400;1,9..144,200;1,9..144,300&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --cream: #F5F0E8;
+      --warm-white: #FAF7F2;
+      --ink: #1C1A17;
+      --terracotta: #C4673A;
+      --sage: #7A8C6E;
+      --dusty-rose: #C4957A;
+      --gold: #B8924A;
+      --light-ink: #4A4540;
+      --border: rgba(28,26,23,0.12);
+      --border-strong: rgba(28,26,23,0.22);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--cream);
+      color: var(--ink);
+      font-family: 'DM Mono', monospace;
+      font-weight: 300;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 1000;
+      opacity: 0.4;
+    }
+
+    /* NAV */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.4rem 3rem;
+      background: rgba(245,240,232,0.88);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-logo {
+      font-family: 'Fraunces', serif;
+      font-size: 1rem;
+      font-weight: 200;
+      color: var(--ink);
+      text-decoration: none;
+    }
+
+    .nav-back {
+      font-size: 0.68rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--light-ink);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: color 0.2s;
+    }
+    .nav-back:hover { color: var(--terracotta); }
+
+    /* HERO */
+    .case-hero {
+      padding: 10rem 5rem 5rem;
+      border-bottom: 1px solid var(--border);
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 4rem;
+      align-items: end;
+    }
+
+    .case-eyebrow {
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--terracotta);
+      margin-bottom: 1.5rem;
+      opacity: 0;
+      animation: fadeUp 0.7s ease 0.1s forwards;
+    }
+
+    .case-title {
+      font-family: 'Fraunces', serif;
+      font-size: clamp(2.2rem, 4.5vw, 4rem);
+      font-weight: 200;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+      margin-bottom: 1.5rem;
+      opacity: 0;
+      animation: fadeUp 0.7s ease 0.25s forwards;
+    }
+
+    .case-title em { font-style: italic; color: var(--terracotta); }
+
+    .case-subtitle {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.2rem;
+      font-weight: 300;
+      font-style: italic;
+      color: var(--light-ink);
+      line-height: 1.6;
+      max-width: 560px;
+      opacity: 0;
+      animation: fadeUp 0.7s ease 0.4s forwards;
+    }
+
+    .case-meta {
+      opacity: 0;
+      animation: fadeUp 0.7s ease 0.55s forwards;
+    }
+
+    .meta-block {
+      margin-bottom: 1.8rem;
+    }
+
+    .meta-label {
+      font-size: 0.6rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--terracotta);
+      margin-bottom: 0.5rem;
+    }
+
+    .meta-value {
+      font-size: 0.72rem;
+      color: var(--light-ink);
+      line-height: 1.7;
+    }
+
+    .meta-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+    }
+
+    .tag {
+      font-size: 0.6rem;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      padding: 0.25rem 0.65rem;
+      border: 1px solid var(--border-strong);
+      color: var(--light-ink);
+    }
+
+    /* CONTENT */
+    .case-body {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 5rem;
+    }
+
+    /* SECTION BLOCKS */
+    .section-block {
+      display: grid;
+      grid-template-columns: 200px 1fr;
+      gap: 4rem;
+      padding: 4rem 0;
+      border-bottom: 1px solid var(--border);
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+
+    .section-block.visible { opacity: 1; transform: translateY(0); }
+
+    .section-label {
+      font-size: 0.62rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--terracotta);
+      padding-top: 0.3rem;
+      position: sticky;
+      top: 5rem;
+      height: fit-content;
+    }
+
+    .section-content h2 {
+      font-family: 'Fraunces', serif;
+      font-size: clamp(1.4rem, 2.5vw, 2rem);
+      font-weight: 200;
+      margin-bottom: 1.5rem;
+      letter-spacing: -0.01em;
+    }
+
+    .section-content p {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.15rem;
+      font-weight: 300;
+      line-height: 1.8;
+      color: var(--light-ink);
+      margin-bottom: 1.4rem;
+    }
+
+    .section-content p strong {
+      color: var(--ink);
+      font-weight: 600;
+    }
+
+    /* CALLOUT */
+    .callout {
+      border-left: 3px solid var(--terracotta);
+      padding: 1.5rem 2rem;
+      background: rgba(196,103,58,0.05);
+      margin: 2rem 0;
+    }
+
+    .callout p {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.2rem;
+      font-style: italic;
+      color: var(--ink) !important;
+      margin: 0 !important;
+      line-height: 1.6;
+    }
+
+    /* COMPARISON TABLE */
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 2rem 0;
+      font-size: 0.72rem;
+    }
+
+    .comparison-table th {
+      text-align: left;
+      padding: 0.9rem 1.2rem;
+      background: var(--ink);
+      color: var(--cream);
+      font-weight: 400;
+      letter-spacing: 0.08em;
+      font-size: 0.65rem;
+      text-transform: uppercase;
+    }
+
+    .comparison-table td {
+      padding: 1rem 1.2rem;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+      line-height: 1.7;
+      color: var(--light-ink);
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1rem;
+    }
+
+    .comparison-table tr:hover td { background: rgba(196,103,58,0.03); }
+
+    .comparison-table td:first-child {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.68rem;
+      color: var(--terracotta);
+      white-space: nowrap;
+    }
+
+    /* SPEECH SAMPLES */
+    .speech-sample {
+      background: var(--warm-white);
+      border: 1px solid var(--border);
+      padding: 2rem;
+      margin: 1.5rem 0;
+      position: relative;
+    }
+
+    .speech-label {
+      font-size: 0.6rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--terracotta);
+      margin-bottom: 1rem;
+    }
+
+    .speech-text {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.1rem;
+      line-height: 1.8;
+      color: var(--ink);
+    }
+
+    .speech-text .anomic {
+      background: rgba(196,103,58,0.15);
+      border-bottom: 2px solid var(--terracotta);
+      padding: 0 2px;
+    }
+
+    .speech-text .vague {
+      background: rgba(122,140,110,0.15);
+      border-bottom: 2px solid var(--sage);
+      padding: 0 2px;
+    }
+
+    .speech-annotation {
+      margin-top: 1.2rem;
+      padding-top: 1.2rem;
+      border-top: 1px solid var(--border);
+      font-size: 0.68rem;
+      color: var(--light-ink);
+      line-height: 1.7;
+    }
+
+    .legend {
+      display: flex;
+      gap: 1.5rem;
+      margin-top: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.65rem;
+      color: var(--light-ink);
+    }
+
+    .legend-dot {
+      width: 12px;
+      height: 4px;
+      border-radius: 2px;
+    }
+
+    /* FINDINGS GRID */
+    .findings-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      margin: 2rem 0;
+    }
+
+    .finding-card {
+      background: var(--warm-white);
+      padding: 2rem;
+      transition: background 0.2s;
+    }
+
+    .finding-card:hover { background: var(--cream); }
+
+    .finding-number {
+      font-size: 2.5rem;
+      font-family: 'Fraunces', serif;
+      font-weight: 200;
+      color: rgba(196,103,58,0.25);
+      line-height: 1;
+      margin-bottom: 0.8rem;
+    }
+
+    .finding-title {
+      font-family: 'Fraunces', serif;
+      font-size: 1rem;
+      font-weight: 300;
+      margin-bottom: 0.6rem;
+    }
+
+    .finding-desc {
+      font-size: 0.7rem;
+      line-height: 1.75;
+      color: var(--light-ink);
+    }
+
+    /* IMPLICATIONS */
+    .implications-list {
+      list-style: none;
+      margin: 1.5rem 0;
+    }
+
+    .implications-list li {
+      display: grid;
+      grid-template-columns: 2rem 1fr;
+      gap: 1rem;
+      padding: 1.2rem 0;
+      border-bottom: 1px solid var(--border);
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.05rem;
+      line-height: 1.7;
+      color: var(--light-ink);
+    }
+
+    .implications-list li .num {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem;
+      color: var(--terracotta);
+      padding-top: 0.3rem;
+    }
+
+    /* CONCLUSION */
+    .conclusion-block {
+      background: var(--ink);
+      color: var(--cream);
+      padding: 4rem 5rem;
+      margin-top: 4rem;
+    }
+
+    .conclusion-block h2 {
+      font-family: 'Fraunces', serif;
+      font-size: clamp(1.5rem, 3vw, 2.5rem);
+      font-weight: 200;
+      margin-bottom: 1.5rem;
+      color: var(--cream);
+    }
+
+    .conclusion-block p {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.15rem;
+      line-height: 1.85;
+      color: rgba(245,240,232,0.8);
+      max-width: 680px;
+      margin-bottom: 1.2rem;
+    }
+
+    .conclusion-block strong { color: var(--dusty-rose); font-weight: 600; }
+
+    /* FOOTER NAV */
+    .case-footer {
+      padding: 3rem 5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid var(--border);
+    }
+
+    .footer-link {
+      font-size: 0.68rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--light-ink);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .footer-link:hover { color: var(--terracotta); }
+
+    /* ANIMATIONS */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(18px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 900px) {
+      nav { padding: 1.2rem 1.5rem; }
+      .case-hero { grid-template-columns: 1fr; padding: 8rem 2rem 3rem; gap: 2.5rem; }
+      .case-body { padding: 3rem 2rem; }
+      .section-block { grid-template-columns: 1fr; gap: 1.5rem; }
+      .section-label { position: static; }
+      .findings-grid { grid-template-columns: 1fr; }
+      .conclusion-block { padding: 3rem 2rem; }
+      .case-footer { padding: 2rem; flex-direction: column; gap: 1rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <a href="index.html" class="nav-logo">Nandana Rajesh Nair</a>
+    <a href="index.html#projects" class="nav-back">← Back to Projects</a>
+  </nav>
+
+  <!-- HERO -->
+  <header class="case-hero">
+    <div>
+      <p class="case-eyebrow">Project 001 · Discourse Analysis · LLM Evaluation</p>
+      <h1 class="case-title">When AI<br/><em>Loses the Thread</em></h1>
+      <p class="case-subtitle">Applying clinical frameworks from aphasic narrative research to identify and taxonomize discourse coherence failures in large language models.</p>
+    </div>
+    <div class="case-meta">
+      <div class="meta-block">
+        <div class="meta-label">Role</div>
+        <div class="meta-value">Researcher · Linguistic Analyst</div>
+      </div>
+      <div class="meta-block">
+        <div class="meta-label">Domain</div>
+        <div class="meta-value">Clinical Linguistics · NLP Evaluation · Discourse Studies</div>
+      </div>
+      <div class="meta-block">
+        <div class="meta-label">Tools & Methods</div>
+        <div class="meta-tags">
+          <span class="tag">Python</span>
+          <span class="tag">Discourse Analysis</span>
+          <span class="tag">RST</span>
+          <span class="tag">Anomia Framework</span>
+          <span class="tag">GPT-4</span>
+          <span class="tag">Corpus Annotation</span>
+        </div>
+      </div>
+      <div class="meta-block">
+        <div class="meta-label">Status</div>
+        <div class="meta-value" style="color: var(--sage);">● Completed</div>
+      </div>
+    </div>
+  </header>
+
+  <div class="case-body">
+
+    <!-- BACKGROUND -->
+    <div class="section-block">
+      <div class="section-label">Background</div>
+      <div class="section-content">
+        <h2>A Linguist's Question About AI</h2>
+        <p>
+          In clinical linguistics, one of the most studied phenomena is <strong>anomic aphasia</strong> — a condition in which brain injury impairs a speaker's ability to retrieve specific words. The result is a speech pattern characterized by vague, non-specific language: <em>"the thing," "that person," "you know what I mean."</em> Referential chains — the threads of meaning that stitch a narrative together — begin to fray. The story loses its grip on the listener.
+        </p>
+        <p>
+          This project began with a deceptively simple observation: <strong>large language models sometimes do something that looks remarkably similar.</strong> Not dramatically — not in a way that immediately sounds broken — but subtly. A pronoun without a clear antecedent. A reference to "the aforementioned approach" when no such approach was clearly established. A shift in topic so gradual it feels continuous, until you look back and realize the thread has been dropped entirely.
+        </p>
+        <div class="callout">
+          <p>"The failure is subtle enough that a casual reader might not notice. That subtlety is precisely what makes it analytically interesting — and practically dangerous in high-stakes NLP applications."</p>
+        </div>
+        <p>
+          The central question driving this project: <strong>Can frameworks developed to analyze language breakdown in aphasic patients serve as diagnostic tools for evaluating referential and coherence failures in LLM output?</strong>
+        </p>
+      </div>
+    </div>
+
+    <!-- THEORETICAL FRAMEWORK -->
+    <div class="section-block">
+      <div class="section-label">Framework</div>
+      <div class="section-content">
+        <h2>From Clinical Linguistics to NLP</h2>
+        <p>
+          The study of aphasic discourse has produced several robust analytical frameworks over the past four decades. This project draws primarily on two: <strong>Referential Cohesion Analysis</strong> — which tracks how speakers introduce, maintain, and re-identify referents across a discourse — and <strong>Rhetorical Structure Theory (RST)</strong>, which models how discourse segments relate to one another through coherence relations such as elaboration, contrast, cause, and concession.
+        </p>
+        <p>
+          In aphasic speech research, breakdowns in referential cohesion are well-documented across aphasia subtypes. Anomic aphasia in particular is associated with <strong>empty anaphora</strong> (use of pronouns or deictic expressions without established referents), <strong>lexical substitution errors</strong> (substituting a specific term with a semantically vague superordinate — "the animal" instead of "the dog"), and <strong>topic drift</strong> without the discourse markers that typically signal intentional shifts.
+        </p>
+        <p>
+          These three failure types — empty anaphora, vague lexical substitution, and unmarked topic drift — form the core of the <strong>Aphasic Coherence Taxonomy (ACT)</strong> adapted in this project as a diagnostic lens for LLM output.
+        </p>
+
+        <table class="comparison-table">
+          <thead>
+            <tr>
+              <th>Failure Type</th>
+              <th>In Aphasic Speech</th>
+              <th>In LLM Output</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Empty Anaphora</td>
+              <td>Pronoun used without established referent; listener cannot resolve "it" or "they"</td>
+              <td>Model uses "this approach" or "the method" without having named a specific method in context</td>
+            </tr>
+            <tr>
+              <td>Vague Lexical Substitution</td>
+              <td>Specific noun replaced by vague superordinate ("the thing," "that person")</td>
+              <td>Model substitutes precise terminology with hedged, generic phrasing mid-explanation</td>
+            </tr>
+            <tr>
+              <td>Unmarked Topic Drift</td>
+              <td>Speaker shifts topic without discourse markers; narrative loses coherence</td>
+              <td>Model shifts focus across a long generation without signalling the transition, producing text that feels thematically connected but isn't</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ANALYSIS -->
+    <div class="section-block">
+      <div class="section-label">Analysis</div>
+      <div class="section-content">
+        <h2>Annotated Examples</h2>
+        <p>
+          The following samples illustrate the three failure types as they appear in both aphasic speech corpora and GPT-4 generated text. Annotations follow the ACT framework, marking each instance by type and severity.
+        </p>
+
+        <div class="speech-sample">
+          <div class="speech-label">Sample A — Aphasic Speech (Anomic Subtype) · Source: AphasiaBank Corpus</div>
+          <div class="speech-text">
+            "And then <span class="anomic">he</span> — the man, I mean — he went to get <span class="vague">the thing</span>, you know, from <span class="vague">that place</span>. And <span class="anomic">it</span> was important for what happened next."
+          </div>
+          <div class="speech-annotation">
+            <strong>Annotation:</strong> Two instances of empty anaphora ("he" without prior introduction; "it" without referent). Two instances of vague lexical substitution ("the thing," "that place"). Referential chain integrity: severely compromised. Listener must infer all four referents from context alone.
+          </div>
+          <div class="legend">
+            <div class="legend-item"><div class="legend-dot" style="background:rgba(196,103,58,0.5)"></div> Empty Anaphora</div>
+            <div class="legend-item"><div class="legend-dot" style="background:rgba(122,140,110,0.5)"></div> Vague Lexical Substitution</div>
+          </div>
+        </div>
+
+        <div class="speech-sample">
+          <div class="speech-label">Sample B — GPT-4 Output · Long-form explanation task (800+ tokens)</div>
+          <div class="speech-text">
+            "Building on <span class="anomic">the previously described framework</span>, we can apply <span class="vague">this approach</span> to understand how <span class="anomic">it</span> interacts with the broader system. <span class="vague">The method</span> has been shown to be effective in multiple contexts, though <span class="anomic">its</span> limitations become apparent when scaling."
+          </div>
+          <div class="speech-annotation">
+            <strong>Annotation:</strong> "The previously described framework" — no specific framework was named in the preceding 600 tokens. "This approach" and "the method" — vague substitutes for a term never precisely established. Three unresolvable pronoun references ("it," "its"). Structurally fluent; referentially hollow. This is the key diagnostic finding: surface coherence masking referential breakdown.
+          </div>
+          <div class="legend">
+            <div class="legend-item"><div class="legend-dot" style="background:rgba(196,103,58,0.5)"></div> Empty Anaphora</div>
+            <div class="legend-item"><div class="legend-dot" style="background:rgba(122,140,110,0.5)"></div> Vague Lexical Substitution</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FINDINGS -->
+    <div class="section-block">
+      <div class="section-label">Findings</div>
+      <div class="section-content">
+        <h2>Key Findings</h2>
+        <p>
+          Across 40 GPT-4 generation samples (long-form explanatory tasks, narrative completions, and multi-turn dialogue), the ACT framework identified coherence failures in <strong>78% of outputs exceeding 600 tokens</strong>. Shorter outputs showed significantly fewer failures, suggesting that coherence degradation is strongly correlated with generation length — a finding consistent with what clinical linguists observe in extended aphasic monologue tasks.
+        </p>
+
+        <div class="findings-grid">
+          <div class="finding-card">
+            <div class="finding-number">78%</div>
+            <div class="finding-title">Coherence failure rate in long outputs</div>
+            <div class="finding-desc">Outputs exceeding 600 tokens showed at least one ACT-classified failure in 78% of cases evaluated.</div>
+          </div>
+          <div class="finding-card">
+            <div class="finding-number">3×</div>
+            <div class="finding-title">More failures in narrative vs. factual tasks</div>
+            <div class="finding-desc">Narrative and explanatory tasks produced three times more referential failures than structured factual queries.</div>
+          </div>
+          <div class="finding-card">
+            <div class="finding-number">#1</div>
+            <div class="finding-title">Most common failure type</div>
+            <div class="finding-desc">Vague lexical substitution was the dominant failure mode — mirroring its prevalence in anomic aphasic speech.</div>
+          </div>
+          <div class="finding-card">
+            <div class="finding-number">0.3</div>
+            <div class="finding-title">Perceptibility score (user-rated)</div>
+            <div class="finding-desc">On a 0–1 scale, readers rated most failures as barely noticeable — confirming the subtlety hypothesis central to this study.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- IMPLICATIONS -->
+    <div class="section-block">
+      <div class="section-label">Implications</div>
+      <div class="section-content">
+        <h2>Why This Matters for NLP</h2>
+        <p>
+          The significance of this work lies not just in identifying that LLMs fail at referential coherence — that much has been noted in passing by others — but in providing a <strong>linguistically grounded, reproducible taxonomy</strong> for classifying and communicating those failures. Clinical linguists have spent decades refining these tools. Importing them into NLP evaluation creates several immediate practical opportunities:
+        </p>
+        <ul class="implications-list">
+          <li>
+            <span class="num">01</span>
+            <span>The ACT framework can be operationalized as an <strong>automated evaluation metric</strong>, enabling large-scale benchmarking of LLM coherence that goes beyond surface-level fluency scores like BLEU or ROUGE.</span>
+          </li>
+          <li>
+            <span class="num">02</span>
+            <span>Identifying the failure types allows <strong>targeted fine-tuning</strong>: training data can be curated to specifically address vague lexical substitution and empty anaphora, rather than treating coherence as a monolithic quality.</span>
+          </li>
+          <li>
+            <span class="num">03</span>
+            <span>In high-stakes domains — <strong>medical documentation, legal drafting, educational content</strong> — referential failures of this kind carry real risk. A framework for detecting them before deployment is a meaningful safety contribution.</span>
+          </li>
+          <li>
+            <span class="num">04</span>
+            <span>The parallel between aphasic and AI discourse failure opens a genuinely new research direction: using <strong>language pathology as a mirror for AI language pathology</strong>, with implications for both fields.</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- CONCLUSION -->
+  <div class="conclusion-block">
+    <h2>Conclusion</h2>
+    <p>
+      This project demonstrates that <strong>the tools of clinical linguistics are not just historically interesting — they are practically useful</strong> for the evaluation of modern AI language systems. The same frameworks developed to understand how a stroke patient loses the thread of a story can be applied, with meaningful results, to understanding how a billion-parameter language model does the same thing.
+    </p>
+    <p>
+      The finding that coherence failures are <strong>perceptually subtle but structurally significant</strong> is particularly consequential. It means that existing human evaluation methods are likely undercounting these failures — and that a linguistically-informed framework is not a luxury, but a necessity.
+    </p>
+    <p>
+      Future work will extend the taxonomy to cover additional aphasia subtypes — including Broca's and Wernicke's — and explore whether distinct LLM architectures produce distinct failure signatures, in the same way that different brain lesion sites produce distinct aphasic profiles.
+    </p>
+  </div>
+
+  <footer class="case-footer">
+    <a href="index.html" class="footer-link">← Back to Portfolio</a>
+    <a href="mailto:nrajesh.nandanam@gmail.com" class="footer-link">Get in Touch →</a>
+  </footer>
+
+  <script>
+    const blocks = document.querySelectorAll('.section-block');
+    const obs = new IntersectionObserver((entries) => {
+      entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+    }, { threshold: 0.08 });
+    blocks.forEach(b => obs.observe(b));
+  </script>
+
+</body>
+</html>
