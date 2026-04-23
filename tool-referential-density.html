@@ -1,0 +1,958 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Referential Density Analyzer · Nandana Rajesh Nair</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Mono:wght@300;400;500&family=Fraunces:ital,opsz,wght@0,9..144,200;0,9..144,400;1,9..144,200;1,9..144,300&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --cream: #F5F0E8;
+      --warm-white: #FAF7F2;
+      --ink: #1C1A17;
+      --terracotta: #C4673A;
+      --sage: #7A8C6E;
+      --dusty-rose: #C4957A;
+      --gold: #B8924A;
+      --light-ink: #4A4540;
+      --border: rgba(28,26,23,0.12);
+      --border-strong: rgba(28,26,23,0.22);
+
+      /* Highlight colors */
+      --hl-pronoun: rgba(196,103,58,0.18);
+      --hl-pronoun-border: #C4673A;
+      --hl-demonstrative: rgba(122,140,110,0.2);
+      --hl-demonstrative-border: #7A8C6E;
+      --hl-comparative: rgba(184,146,74,0.2);
+      --hl-comparative-border: #B8924A;
+      --hl-substitution: rgba(196,149,122,0.25);
+      --hl-substitution-border: #C4957A;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--cream);
+      color: var(--ink);
+      font-family: 'DM Mono', monospace;
+      font-weight: 300;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 1000;
+      opacity: 0.4;
+    }
+
+    /* NAV */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.4rem 3rem;
+      background: rgba(245,240,232,0.88);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-logo {
+      font-family: 'Fraunces', serif;
+      font-size: 1rem;
+      font-weight: 200;
+      color: var(--ink);
+      text-decoration: none;
+    }
+
+    .nav-back {
+      font-size: 0.68rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--light-ink);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .nav-back:hover { color: var(--terracotta); }
+
+    /* HERO */
+    .tool-hero {
+      padding: 9rem 5rem 4rem;
+      border-bottom: 1px solid var(--border);
+      display: grid;
+      grid-template-columns: 1.4fr 1fr;
+      gap: 4rem;
+      align-items: end;
+    }
+
+    .tool-eyebrow {
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--terracotta);
+      margin-bottom: 1.2rem;
+      opacity: 0;
+      animation: fadeUp 0.6s ease 0.1s forwards;
+    }
+
+    .tool-title {
+      font-family: 'Fraunces', serif;
+      font-size: clamp(2rem, 4vw, 3.5rem);
+      font-weight: 200;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+      margin-bottom: 1.2rem;
+      opacity: 0;
+      animation: fadeUp 0.6s ease 0.2s forwards;
+    }
+
+    .tool-title em { font-style: italic; color: var(--terracotta); }
+
+    .tool-subtitle {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.1rem;
+      font-style: italic;
+      color: var(--light-ink);
+      line-height: 1.65;
+      max-width: 520px;
+      opacity: 0;
+      animation: fadeUp 0.6s ease 0.3s forwards;
+    }
+
+    .tool-credit {
+      opacity: 0;
+      animation: fadeUp 0.6s ease 0.4s forwards;
+    }
+
+    .credit-label {
+      font-size: 0.6rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--terracotta);
+      margin-bottom: 0.5rem;
+    }
+
+    .credit-text {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 0.95rem;
+      font-style: italic;
+      color: var(--light-ink);
+      line-height: 1.6;
+    }
+
+    /* MAIN TOOL AREA */
+    .tool-body {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      min-height: calc(100vh - 280px);
+    }
+
+    /* INPUT PANEL */
+    .input-panel {
+      padding: 3rem;
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .panel-label {
+      font-size: 0.62rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--terracotta);
+    }
+
+    .sample-btns {
+      display: flex;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+    }
+
+    .sample-btn {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.62rem;
+      letter-spacing: 0.06em;
+      padding: 0.4rem 0.9rem;
+      border: 1px solid var(--border-strong);
+      background: transparent;
+      color: var(--light-ink);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .sample-btn:hover {
+      border-color: var(--terracotta);
+      color: var(--terracotta);
+      background: rgba(196,103,58,0.04);
+    }
+
+    textarea {
+      width: 100%;
+      flex: 1;
+      min-height: 240px;
+      padding: 1.5rem;
+      background: var(--warm-white);
+      border: 1px solid var(--border);
+      color: var(--ink);
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.05rem;
+      line-height: 1.75;
+      resize: vertical;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    textarea:focus { border-color: var(--terracotta); }
+    textarea::placeholder { color: rgba(74,69,64,0.4); font-style: italic; }
+
+    .analyze-btn {
+      width: 100%;
+      padding: 1rem;
+      background: var(--ink);
+      color: var(--cream);
+      font-family: 'DM Mono', monospace;
+      font-size: 0.72rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      border: none;
+      cursor: pointer;
+      transition: background 0.25s;
+    }
+
+    .analyze-btn:hover { background: var(--terracotta); }
+    .analyze-btn:disabled { background: rgba(28,26,23,0.3); cursor: not-allowed; }
+
+    .clear-btn {
+      width: 100%;
+      padding: 0.7rem;
+      background: transparent;
+      color: var(--light-ink);
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      border: 1px solid var(--border);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .clear-btn:hover { border-color: var(--terracotta); color: var(--terracotta); }
+
+    /* OUTPUT PANEL */
+    .output-panel {
+      padding: 3rem;
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+      background: var(--warm-white);
+    }
+
+    /* EMPTY STATE */
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      text-align: center;
+      gap: 1rem;
+      opacity: 0.5;
+    }
+
+    .empty-icon {
+      font-size: 2.5rem;
+      opacity: 0.4;
+    }
+
+    .empty-text {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1rem;
+      font-style: italic;
+      color: var(--light-ink);
+    }
+
+    /* RESULTS */
+    .results { display: none; flex-direction: column; gap: 2rem; }
+    .results.visible { display: flex; }
+
+    /* SCORE DISPLAY */
+    .score-block {
+      background: var(--ink);
+      color: var(--cream);
+      padding: 2rem;
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 2rem;
+      align-items: center;
+    }
+
+    .score-number {
+      font-family: 'Fraunces', serif;
+      font-size: 4rem;
+      font-weight: 200;
+      line-height: 1;
+      color: var(--terracotta);
+    }
+
+    .score-label {
+      font-size: 0.6rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: rgba(245,240,232,0.5);
+      margin-bottom: 0.4rem;
+    }
+
+    .score-interpretation {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1rem;
+      font-style: italic;
+      color: rgba(245,240,232,0.85);
+      line-height: 1.5;
+    }
+
+    /* SCORE BAR */
+    .score-bar-wrap {
+      padding: 1.5rem;
+      border: 1px solid var(--border);
+      background: var(--cream);
+    }
+
+    .score-bar-label {
+      font-size: 0.6rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--light-ink);
+      margin-bottom: 0.8rem;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .score-bar-track {
+      height: 6px;
+      background: var(--border);
+      position: relative;
+      margin-bottom: 0.5rem;
+    }
+
+    .score-bar-fill {
+      height: 100%;
+      background: var(--terracotta);
+      transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+      width: 0%;
+    }
+
+    .score-bar-markers {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.58rem;
+      color: var(--light-ink);
+      opacity: 0.6;
+    }
+
+    /* BREAKDOWN */
+    .breakdown-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+    }
+
+    .breakdown-card {
+      background: var(--cream);
+      padding: 1.2rem;
+    }
+
+    .breakdown-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      display: inline-block;
+      margin-right: 0.5rem;
+    }
+
+    .breakdown-name {
+      font-size: 0.65rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--light-ink);
+      margin-bottom: 0.4rem;
+      display: flex;
+      align-items: center;
+    }
+
+    .breakdown-count {
+      font-family: 'Fraunces', serif;
+      font-size: 1.8rem;
+      font-weight: 200;
+      line-height: 1;
+      margin-bottom: 0.2rem;
+    }
+
+    .breakdown-examples {
+      font-size: 0.62rem;
+      color: var(--light-ink);
+      font-style: italic;
+      line-height: 1.5;
+    }
+
+    /* ANNOTATED TEXT */
+    .annotated-wrap {
+      border: 1px solid var(--border);
+      background: var(--cream);
+    }
+
+    .annotated-header {
+      padding: 0.8rem 1.2rem;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.6rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--terracotta);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .annotated-text {
+      padding: 1.5rem;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.05rem;
+      line-height: 1.9;
+      color: var(--ink);
+    }
+
+    .ref-pronoun {
+      background: var(--hl-pronoun);
+      border-bottom: 2px solid var(--hl-pronoun-border);
+      padding: 0 2px;
+      border-radius: 1px;
+      cursor: help;
+      position: relative;
+    }
+
+    .ref-demonstrative {
+      background: var(--hl-demonstrative);
+      border-bottom: 2px solid var(--hl-demonstrative-border);
+      padding: 0 2px;
+      border-radius: 1px;
+      cursor: help;
+    }
+
+    .ref-comparative {
+      background: var(--hl-comparative);
+      border-bottom: 2px solid var(--hl-comparative-border);
+      padding: 0 2px;
+      border-radius: 1px;
+      cursor: help;
+    }
+
+    .ref-substitution {
+      background: var(--hl-substitution);
+      border-bottom: 2px solid var(--hl-substitution-border);
+      padding: 0 2px;
+      border-radius: 1px;
+      cursor: help;
+    }
+
+    /* LEGEND */
+    .legend-bar {
+      padding: 1rem 1.5rem;
+      border-top: 1px solid var(--border);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.2rem;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.62rem;
+      color: var(--light-ink);
+    }
+
+    .legend-swatch {
+      width: 20px;
+      height: 3px;
+      border-radius: 2px;
+    }
+
+    /* ABOUT SECTION */
+    .about-section {
+      padding: 4rem 5rem;
+      border-top: 1px solid var(--border);
+      display: grid;
+      grid-template-columns: 200px 1fr;
+      gap: 4rem;
+    }
+
+    .about-section-label {
+      font-size: 0.62rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--terracotta);
+      padding-top: 0.3rem;
+    }
+
+    .about-section-content h3 {
+      font-family: 'Fraunces', serif;
+      font-size: 1.4rem;
+      font-weight: 200;
+      margin-bottom: 1rem;
+    }
+
+    .about-section-content p {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.05rem;
+      line-height: 1.8;
+      color: var(--light-ink);
+      margin-bottom: 1rem;
+    }
+
+    .about-section-content p strong { color: var(--ink); font-weight: 600; }
+
+    .ref-types {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+      margin-top: 1.5rem;
+    }
+
+    .ref-type-card {
+      padding: 1rem 1.2rem;
+      border: 1px solid var(--border);
+    }
+
+    .ref-type-name {
+      font-size: 0.62rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 0.4rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .ref-type-dot { width: 8px; height: 8px; border-radius: 50%; }
+
+    .ref-type-desc {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 0.95rem;
+      color: var(--light-ink);
+      line-height: 1.55;
+    }
+
+    .ref-type-examples {
+      font-size: 0.62rem;
+      color: var(--terracotta);
+      margin-top: 0.4rem;
+      font-style: italic;
+    }
+
+    /* FOOTER */
+    .tool-footer {
+      padding: 2rem 5rem;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .footer-link {
+      font-size: 0.68rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--light-ink);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .footer-link:hover { color: var(--terracotta); }
+
+    /* ANIMATIONS */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 900px) {
+      nav { padding: 1.2rem 1.5rem; }
+      .tool-hero { grid-template-columns: 1fr; padding: 7rem 2rem 3rem; gap: 2rem; }
+      .tool-body { grid-template-columns: 1fr; }
+      .input-panel { border-right: none; border-bottom: 1px solid var(--border); padding: 2rem; }
+      .output-panel { padding: 2rem; }
+      .about-section { grid-template-columns: 1fr; padding: 3rem 2rem; gap: 1.5rem; }
+      .ref-types { grid-template-columns: 1fr; }
+      .tool-footer { padding: 2rem; flex-direction: column; gap: 1rem; }
+      .breakdown-grid { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <a href="index.html" class="nav-logo">Nandana Rajesh Nair</a>
+    <a href="index.html#projects" class="nav-back">← Back to Portfolio</a>
+  </nav>
+
+  <!-- HERO -->
+  <header class="tool-hero">
+    <div>
+      <p class="tool-eyebrow">Interactive Tool · Discourse Analysis · Halliday & Hasan (1976)</p>
+      <h1 class="tool-title">Referential<br/><em>Density Analyzer</em></h1>
+      <p class="tool-subtitle">Paste any text to measure how much of its meaning depends on reference — pronouns, demonstratives, comparatives — versus concrete, explicit language. Based on Halliday & Hasan's cohesion framework.</p>
+    </div>
+    <div class="tool-credit">
+      <div class="credit-label">Theoretical Basis</div>
+      <div class="credit-text">Halliday, M.A.K. & Hasan, R. (1976). <em>Cohesion in English.</em> Longman. — The foundational taxonomy of referential cohesion in discourse, distinguishing personal, demonstrative, comparative, and substitutive reference as mechanisms of textual cohesion.</div>
+    </div>
+  </header>
+
+  <!-- TOOL -->
+  <div class="tool-body">
+
+    <!-- INPUT -->
+    <div class="input-panel">
+      <div class="panel-label">Input Text</div>
+
+      <div>
+        <div class="panel-label" style="margin-bottom: 0.6rem;">Try a sample</div>
+        <div class="sample-btns">
+          <button class="sample-btn" onclick="loadSample('clinical')">Clinical Speech</button>
+          <button class="sample-btn" onclick="loadSample('news')">News Article</button>
+          <button class="sample-btn" onclick="loadSample('literary')">Literary Prose</button>
+          <button class="sample-btn" onclick="loadSample('technical')">Technical Text</button>
+        </div>
+      </div>
+
+      <textarea id="inputText" placeholder="Paste any text here — a paragraph, a speech transcript, an article excerpt — and the tool will analyze its referential structure..."></textarea>
+
+      <div id="wordCount" style="font-size:0.62rem; color: var(--light-ink); text-align: right;">0 words</div>
+
+      <button class="analyze-btn" onclick="analyze()" id="analyzeBtn" disabled>Analyze Text →</button>
+      <button class="clear-btn" onclick="clearAll()">Clear</button>
+    </div>
+
+    <!-- OUTPUT -->
+    <div class="output-panel">
+
+      <div class="empty-state" id="emptyState">
+        <div class="empty-icon">◎</div>
+        <div class="empty-text">Your analysis will appear here.<br/>Paste text and click Analyze.</div>
+      </div>
+
+      <div class="results" id="results">
+
+        <!-- SCORE -->
+        <div class="score-block">
+          <div class="score-number" id="scoreDisplay">—</div>
+          <div>
+            <div class="score-label">Referential Density Score</div>
+            <div class="score-interpretation" id="scoreInterp">—</div>
+          </div>
+        </div>
+
+        <!-- BAR -->
+        <div class="score-bar-wrap">
+          <div class="score-bar-label">
+            <span>Density Scale</span>
+            <span id="scorePercent">—</span>
+          </div>
+          <div class="score-bar-track">
+            <div class="score-bar-fill" id="scoreBar"></div>
+          </div>
+          <div class="score-bar-markers">
+            <span>Explicit (0)</span>
+            <span>Balanced (0.25)</span>
+            <span>Referential (0.5+)</span>
+          </div>
+        </div>
+
+        <!-- BREAKDOWN -->
+        <div class="breakdown-grid">
+          <div class="breakdown-card">
+            <div class="breakdown-name"><span class="breakdown-dot" style="background:#C4673A"></span>Personal</div>
+            <div class="breakdown-count" id="countPersonal">0</div>
+            <div class="breakdown-examples" id="exPersonal">—</div>
+          </div>
+          <div class="breakdown-card">
+            <div class="breakdown-name"><span class="breakdown-dot" style="background:#7A8C6E"></span>Demonstrative</div>
+            <div class="breakdown-count" id="countDemo">0</div>
+            <div class="breakdown-examples" id="exDemo">—</div>
+          </div>
+          <div class="breakdown-card">
+            <div class="breakdown-name"><span class="breakdown-dot" style="background:#B8924A"></span>Comparative</div>
+            <div class="breakdown-count" id="countComp">0</div>
+            <div class="breakdown-examples" id="exComp">—</div>
+          </div>
+          <div class="breakdown-card">
+            <div class="breakdown-name"><span class="breakdown-dot" style="background:#C4957A"></span>Substitution</div>
+            <div class="breakdown-count" id="countSub">0</div>
+            <div class="breakdown-examples" id="exSub">—</div>
+          </div>
+        </div>
+
+        <!-- ANNOTATED TEXT -->
+        <div class="annotated-wrap">
+          <div class="annotated-header">
+            <span>Annotated Text</span>
+            <span id="totalRefs">0 referential expressions</span>
+          </div>
+          <div class="annotated-text" id="annotatedText"></div>
+          <div class="legend-bar">
+            <div class="legend-item"><div class="legend-swatch" style="background:#C4673A"></div>Personal reference</div>
+            <div class="legend-item"><div class="legend-swatch" style="background:#7A8C6E"></div>Demonstrative</div>
+            <div class="legend-item"><div class="legend-swatch" style="background:#B8924A"></div>Comparative</div>
+            <div class="legend-item"><div class="legend-swatch" style="background:#C4957A"></div>Substitution</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ABOUT THE METRIC -->
+  <div class="about-section">
+    <div class="about-section-label">About this metric</div>
+    <div class="about-section-content">
+      <h3>What is Referential Density?</h3>
+      <p>
+        In their landmark 1976 work <em>Cohesion in English</em>, linguists <strong>M.A.K. Halliday and Ruqaiya Hasan</strong> identified reference as one of the primary mechanisms through which texts achieve cohesion — the property of hanging together as a unified whole rather than a sequence of unrelated sentences.
+      </p>
+      <p>
+        Referential density measures the proportion of a text's content words that are referential expressions: words whose meaning depends on pointing elsewhere — to something already said, something about to be said, or something shared in context. A higher density means the text leans heavily on reference; a lower density means it is more lexically explicit.
+      </p>
+      <p>
+        This metric has particular significance in <strong>clinical linguistics</strong>, where research on aphasic speech — especially anomic aphasia — has documented characteristic referential density signatures. Speakers with word-retrieval difficulties tend to substitute specific nouns with high-frequency referential expressions (<em>"the thing," "it," "that one"</em>), producing texts with anomalously high referential density and weakened lexical cohesion. This tool applies the same analytical lens to any text.
+      </p>
+
+      <div class="ref-types">
+        <div class="ref-type-card">
+          <div class="ref-type-name"><div class="ref-type-dot" style="background:#C4673A"></div>Personal Reference</div>
+          <div class="ref-type-desc">Pronouns and possessives that refer to participants in or outside the text.</div>
+          <div class="ref-type-examples">he, she, it, they, him, her, his, their, we, you, I, me, my...</div>
+        </div>
+        <div class="ref-type-card">
+          <div class="ref-type-name"><div class="ref-type-dot" style="background:#7A8C6E"></div>Demonstrative Reference</div>
+          <div class="ref-type-desc">Expressions that locate referents on a proximal–distal scale.</div>
+          <div class="ref-type-examples">this, that, these, those, here, there, now, then...</div>
+        </div>
+        <div class="ref-type-card">
+          <div class="ref-type-name"><div class="ref-type-dot" style="background:#B8924A"></div>Comparative Reference</div>
+          <div class="ref-type-desc">Expressions that set up identity or similarity relations between referents.</div>
+          <div class="ref-type-examples">same, similar, such, other, different, more, less, better, worse...</div>
+        </div>
+        <div class="ref-type-card">
+          <div class="ref-type-name"><div class="ref-type-dot" style="background:#C4957A"></div>Substitution</div>
+          <div class="ref-type-desc">Expressions that stand in place of a noun, verb, or clause mentioned earlier.</div>
+          <div class="ref-type-examples">one, ones, do so, the same, likewise, so, not...</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="tool-footer">
+    <a href="index.html" class="footer-link">← Back to Portfolio</a>
+    <a href="mailto:nrajesh.nandanam@gmail.com" class="footer-link">Contact Nandana →</a>
+  </footer>
+
+  <script>
+    // ── REFERENCE LEXICONS (Halliday & Hasan 1976) ──────────────────────────
+
+    const PERSONAL = [
+      'i','me','my','myself','mine',
+      'we','us','our','ourselves','ours',
+      'you','your','yourself','yourselves','yours',
+      'he','him','his','himself',
+      'she','her','hers','herself',
+      'it','its','itself',
+      'they','them','their','theirs','themselves',
+      'one','one\'s','oneself'
+    ];
+
+    const DEMONSTRATIVE = [
+      'this','that','these','those',
+      'here','there','now','then',
+      'the former','the latter'
+    ];
+
+    const COMPARATIVE = [
+      'same','similar','similarly','identical','identically',
+      'such','likewise','other','different','differently',
+      'more','less','better','worse','equal','equally',
+      'further','additional','another','else'
+    ];
+
+    const SUBSTITUTION = [
+      'one','ones','do so','do the same','the same',
+      'not','so','neither','nor'
+    ];
+
+    // ── SAMPLE TEXTS ─────────────────────────────────────────────────────────
+
+    const SAMPLES = {
+      clinical: `He went to get it from there. She said that they needed it before he came back. It was important, she told him, because they had been waiting for it for a long time. He didn't know if he could find it but he said he would try. When he got there, it wasn't where he thought it would be. They had moved it, or someone had taken it. He came back without it. She looked at him and said nothing. That was that.`,
+
+      news: `The government announced new economic measures yesterday. The package, which officials say will stabilize markets, includes several provisions targeting inflation. Analysts have described the plan as ambitious but risky. Some economists argue that similar policies have failed in comparable economies. Others say the situation is different enough to warrant a fresh approach. The prime minister is expected to address parliament on the matter this week.`,
+
+      literary: `She had lived in the house for forty years and she knew every sound it made. In winter it groaned when the wind came off the lake. In summer the pipes sang in the early morning. She had learned to sleep through all of it. But this sound was different. She lay still and listened. It came again — soft, deliberate, from somewhere below her. She got up.`,
+
+      technical: `The algorithm processes input data through three sequential layers. Each layer applies a transformation function to the output of the previous one. The final layer produces a vector representation that encodes the semantic content of the original input. This representation can then be compared against others in the embedding space using cosine similarity. Vectors that are closer together indicate greater semantic similarity between the corresponding texts.`
+    };
+
+    // ── UI HELPERS ────────────────────────────────────────────────────────────
+
+    const textarea = document.getElementById('inputText');
+    const analyzeBtn = document.getElementById('analyzeBtn');
+    const wordCountEl = document.getElementById('wordCount');
+
+    textarea.addEventListener('input', () => {
+      const words = textarea.value.trim().split(/\s+/).filter(w => w.length > 0);
+      const count = textarea.value.trim() === '' ? 0 : words.length;
+      wordCountEl.textContent = `${count} word${count !== 1 ? 's' : ''}`;
+      analyzeBtn.disabled = count < 5;
+    });
+
+    function loadSample(key) {
+      textarea.value = SAMPLES[key];
+      textarea.dispatchEvent(new Event('input'));
+    }
+
+    function clearAll() {
+      textarea.value = '';
+      textarea.dispatchEvent(new Event('input'));
+      document.getElementById('results').classList.remove('visible');
+      document.getElementById('emptyState').style.display = 'flex';
+    }
+
+    // ── TOKENIZER ─────────────────────────────────────────────────────────────
+
+    function tokenize(text) {
+      // Split into tokens preserving punctuation boundaries
+      return text.split(/(\s+|(?<=[a-zA-Z])(?=[^a-zA-Z\s])|(?<=[^a-zA-Z\s])(?=[a-zA-Z]))/).filter(t => t.trim().length > 0 || t.match(/\s+/));
+    }
+
+    function isWord(token) {
+      return /[a-zA-Z]/.test(token);
+    }
+
+    function getRefType(word) {
+      const w = word.toLowerCase().replace(/[^a-z']/g, '');
+      if (PERSONAL.includes(w)) return 'pronoun';
+      if (DEMONSTRATIVE.includes(w)) return 'demonstrative';
+      if (COMPARATIVE.includes(w)) return 'comparative';
+      if (SUBSTITUTION.includes(w) && !PERSONAL.includes(w) && !DEMONSTRATIVE.includes(w)) return 'substitution';
+      return null;
+    }
+
+    // ── ANALYSIS ENGINE ───────────────────────────────────────────────────────
+
+    function analyze() {
+      const text = textarea.value.trim();
+      if (!text) return;
+
+      const words = text.split(/\s+/).filter(w => /[a-zA-Z]/.test(w));
+      const totalWords = words.length;
+
+      let personal = [], demonstrative = [], comparative = [], substitution = [];
+
+      words.forEach(w => {
+        const type = getRefType(w);
+        const clean = w.toLowerCase().replace(/[^a-z']/g, '');
+        if (type === 'pronoun') personal.push(clean);
+        else if (type === 'demonstrative') demonstrative.push(clean);
+        else if (type === 'comparative') comparative.push(clean);
+        else if (type === 'substitution') substitution.push(clean);
+      });
+
+      const totalRefs = personal.length + demonstrative.length + comparative.length + substitution.length;
+      const density = totalWords > 0 ? totalRefs / totalWords : 0;
+      const densityRounded = Math.round(density * 100) / 100;
+
+      // Interpretation
+      let interp = '';
+      if (density < 0.10) interp = 'Very low density — highly explicit, lexically rich text. Each sentence introduces concrete, specific information.';
+      else if (density < 0.20) interp = 'Low density — text is mostly explicit with occasional referential cohesion. Characteristic of formal writing.';
+      else if (density < 0.30) interp = 'Moderate density — balanced use of reference and explicit naming. Typical of fluent conversational or narrative prose.';
+      else if (density < 0.42) interp = 'High density — significant referential load. Text relies on shared context or prior discourse to be fully interpretable.';
+      else interp = 'Very high density — referential expressions dominate. This pattern appears in casual speech, literary stream-of-consciousness, and — clinically — in anomic aphasic discourse where specific nouns are substituted with referential placeholders.';
+
+      // Unique examples (top 4)
+      const uniqueEx = arr => [...new Set(arr)].slice(0, 4).join(', ') || '—';
+
+      // Annotate text
+      const annotated = annotateText(text);
+
+      // ── RENDER ──────────────────────────────────────────────────────────────
+
+      document.getElementById('emptyState').style.display = 'none';
+      document.getElementById('results').classList.add('visible');
+
+      document.getElementById('scoreDisplay').textContent = densityRounded.toFixed(2);
+      document.getElementById('scoreInterp').textContent = interp;
+      document.getElementById('scorePercent').textContent = `${(density * 100).toFixed(1)}% referential`;
+
+      // Animate bar (cap at 60% density = 100% bar)
+      const barPct = Math.min((density / 0.6) * 100, 100);
+      setTimeout(() => {
+        document.getElementById('scoreBar').style.width = barPct + '%';
+      }, 50);
+
+      // Breakdown
+      document.getElementById('countPersonal').textContent = personal.length;
+      document.getElementById('countDemo').textContent = demonstrative.length;
+      document.getElementById('countComp').textContent = comparative.length;
+      document.getElementById('countSub').textContent = substitution.length;
+      document.getElementById('exPersonal').textContent = uniqueEx(personal);
+      document.getElementById('exDemo').textContent = uniqueEx(demonstrative);
+      document.getElementById('exComp').textContent = uniqueEx(comparative);
+      document.getElementById('exSub').textContent = uniqueEx(substitution);
+
+      // Annotated text
+      document.getElementById('annotatedText').innerHTML = annotated;
+      document.getElementById('totalRefs').textContent = `${totalRefs} referential expression${totalRefs !== 1 ? 's' : ''} in ${totalWords} words`;
+
+      // Scroll to results on mobile
+      if (window.innerWidth < 900) {
+        document.getElementById('results').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+
+    function annotateText(text) {
+      // Split text into tokens (words + whitespace + punctuation)
+      const parts = text.split(/(\s+)/);
+      return parts.map(part => {
+        if (!part.trim() || !/[a-zA-Z]/.test(part)) return part;
+        const type = getRefType(part);
+        const labels = {
+          pronoun: 'Personal reference',
+          demonstrative: 'Demonstrative reference',
+          comparative: 'Comparative reference',
+          substitution: 'Substitution'
+        };
+        const classes = {
+          pronoun: 'ref-pronoun',
+          demonstrative: 'ref-demonstrative',
+          comparative: 'ref-comparative',
+          substitution: 'ref-substitution'
+        };
+        if (type) {
+          return `<span class="${classes[type]}" title="${labels[type]}">${part}</span>`;
+        }
+        return part;
+      }).join('');
+    }
+  </script>
+
+</body>
+</html>
